@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -11,7 +11,7 @@ app.get('/assets/php/portfolio-list.php', async (req, res) => {
     const portfolioRoot = path.join(__dirname, 'assets', 'img', 'portfolio');
     let dirents;
     try {
-      dirents = await fs.promises.readdir(portfolioRoot, { withFileTypes: true });
+      dirents = await fs.readdir(portfolioRoot, { withFileTypes: true });
     } catch (e) {
       // Если папки нет — вернём пустой список
       console.log('Portfolio directory not found, returning empty array');
@@ -25,7 +25,7 @@ app.get('/assets/php/portfolio-list.php', async (req, res) => {
       const full = path.join(portfolioRoot, folder);
       
       try {
-        let files = await fs.promises.readdir(full);
+        let files = await fs.readdir(full);
         files = files.filter(fn => /\.(jpe?g|png|gif|webp)$/i.test(fn));
         files.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
         

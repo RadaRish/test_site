@@ -77,6 +77,10 @@ function renderPortfolioGallery(containerId) {
   // Проверяем, что данные загружены
   if (!portfolioSeries) {
     console.warn('Portfolio data not loaded yet');
+    // Пытаемся загрузить данные
+    fetchPortfolioSeries(() => {
+      renderPortfolioGallery(containerId);
+    });
     return;
   }
   
@@ -132,7 +136,15 @@ function renderHomeGallery(containerId, seriesList) {
     seriesList = portfolioSeries;
   }
   
-  if (!seriesList || !Array.isArray(seriesList) || seriesList.length === 0) {
+  // Если данные еще не загружены, загружаем их
+  if (!seriesList) {
+    fetchPortfolioSeries(() => {
+      renderHomeGallery(containerId, portfolioSeries);
+    });
+    return;
+  }
+  
+  if (!Array.isArray(seriesList) || seriesList.length === 0) {
     console.warn('No series list provided for home gallery');
     return;
   }
@@ -218,52 +230,40 @@ function renderInstagramCarousel(containerId) {
 function openSeriesGallery(folder, name) {
   // Открывает модальное окно с миниатюрами всех фото серии
   console.log('Opening gallery for folder:', folder, 'name:', name);
-  let modal = document.getElementById('portfolioModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'portfolioModal';
-    modal.className = 'portfolio-modal';
-    modal.innerHTML = '<div class="modal-content"><span class="close" onclick="closePortfolioModal()">&times;</span><div class="modal-title"></div><div class="modal-gallery"></div></div>';
-    document.body.appendChild(modal);
-  }
-  modal.querySelector('.modal-title').textContent = name;
-  const gallery = modal.querySelector('.modal-gallery');
-  gallery.innerHTML = '';
   
-  // Находим серию по имени папки
-  const series = portfolioSeries.find(s => s.folder === folder);
-  console.log('Found series:', series);
-  
-  if (series && Array.isArray(series.images) && series.images.length > 0) {
-    series.images.forEach(img => {
-      // Properly encode the URL for Cyrillic characters
-      const encodedFolder = encodeURIComponent(folder);
-      const encodedImage = encodeURIComponent(img);
-      const thumb = document.createElement('img');
-      thumb.src = `assets/img/portfolio/${encodedFolder}/${encodedImage}`;
-      thumb.className = 'portfolio-thumb';
-      thumb.onclick = () => openFullImage(thumb.src);
-      gallery.appendChild(thumb);
-    });
-  } else {
-    // Если данные еще не загружены, попробуем загрузить их
-    fetchPortfolioSeries(() => {
-      const series = portfolioSeries.find(s => s.folder === folder);
-      if (series && Array.isArray(series.images) && series.images.length > 0) {
-        series.images.forEach(img => {
-          const encodedFolder = encodeURIComponent(folder);
-          const encodedImage = encodeURIComponent(img);
-          const thumb = document.createElement('img');
-          thumb.src = `assets/img/portfolio/${encodedFolder}/${encodedImage}`;
-          thumb.className = 'portfolio-thumb';
-          thumb.onclick = () => openFullImage(thumb.src);
-          gallery.appendChild(thumb);
-        });
-      }
-    });
-  }
-  
-  modal.style.display = 'block';
+  // Всегда загружаем свежие данные при открытии галереи
+  fetchPortfolioSeries(() => {
+    let modal = document.getElementById('portfolioModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'portfolioModal';
+      modal.className = 'portfolio-modal';
+      modal.innerHTML = '<div class="modal-content"><span class="close" onclick="closePortfolioModal()">&times;</span><div class="modal-title"></div><div class="modal-gallery"></div></div>';
+      document.body.appendChild(modal);
+    }
+    modal.querySelector('.modal-title').textContent = name;
+    const gallery = modal.querySelector('.modal-gallery');
+    gallery.innerHTML = '';
+    
+    // Находим серию по имени папки
+    const series = portfolioSeries.find(s => s.folder === folder);
+    console.log('Found series:', series);
+    
+    if (series && Array.isArray(series.images) && series.images.length > 0) {
+      series.images.forEach(img => {
+        // Properly encode the URL for Cyrillic characters
+        const encodedFolder = encodeURIComponent(folder);
+        const encodedImage = encodeURIComponent(img);
+        const thumb = document.createElement('img');
+        thumb.src = `assets/img/portfolio/${encodedFolder}/${encodedImage}`;
+        thumb.className = 'portfolio-thumb';
+        thumb.onclick = () => openFullImage(thumb.src);
+        gallery.appendChild(thumb);
+      });
+    }
+    
+    modal.style.display = 'block';
+  });
 }
 
 function closePortfolioModal() {

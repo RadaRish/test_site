@@ -1,0 +1,63 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="animatedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Animation for rotation -->
+    <animateTransform 
+      id="rotate"
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 40 40"
+      to="360 40 40"
+      dur="3s"
+      repeatCount="indefinite"/>
+  </defs>
+  
+  <!-- Animated outer ring -->
+  <circle cx="40" cy="40" r="35" fill="none" stroke="url(#animatedGradient)" stroke-width="1" opacity="0.2">
+    <animateTransform 
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 40 40"
+      to="360 40 40"
+      dur="4s"
+      repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Main camera lens structure -->
+  <g>
+    <animateTransform 
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 40 40"
+      to="-360 40 40"
+      dur="6s"
+      repeatCount="indefinite"/>
+    
+    <!-- Outer lens ring -->
+    <circle cx="40" cy="40" r="22" fill="none" stroke="url(#animatedGradient)" stroke-width="2" opacity="0.8"/>
+    <!-- Middle lens ring -->
+    <circle cx="40" cy="40" r="16" fill="none" stroke="url(#animatedGradient)" stroke-width="2" opacity="0.9"/>
+    <!-- Inner lens ring -->
+    <circle cx="40" cy="40" r="10" fill="none" stroke="url(#animatedGradient)" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Static center elements -->
+  <circle cx="40" cy="40" r="5" fill="url(#animatedGradient)" opacity="0.8">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Camera elements -->
+  <rect x="52" y="32" width="6" height="3" rx="1" fill="url(#animatedGradient)" opacity="0.8"/>
+  <circle cx="55" cy="28" r="2" fill="url(#animatedGradient)" opacity="0.6"/>
+  
+  <!-- Stylized "D" -->
+  <text x="40" y="68" font-family="Arial Black, sans-serif" font-size="14" font-weight="900" fill="url(#animatedGradient)" text-anchor="middle" opacity="0.9">D</text>
+</svg>

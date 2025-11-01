@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="50" viewBox="0 0 220 50">
+  <defs>
+    <style>
+      .signature-text {
+        font-family: 'Allura', 'Great Vibes', 'Tangerine', serif;
+        font-size: 32px;
+        font-weight: 400;
+        fill: #ffffff;
+        text-anchor: middle;
+        dominant-baseline: central;
+        letter-spacing: 1px;
+        opacity: 0.95;
+        font-style: italic;
+      }
+      .signature-underline {
+        stroke: #ffffff;
+        stroke-width: 1;
+        fill: none;
+        opacity: 0.7;
+        stroke-linecap: round;
+      }
+    </style>
+  </defs>
+  
+  <!-- Signature text only -->
+  <text x="110" y="25" class="signature-text">Удодов Руслан</text>
+</svg>

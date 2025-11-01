@@ -1,0 +1,27 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="loaderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f093fb;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle with subtle glow -->
+  <circle cx="40" cy="40" r="35" fill="none" stroke="url(#loaderGradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Main camera lens -->
+  <circle cx="40" cy="40" r="20" fill="none" stroke="url(#loaderGradient)" stroke-width="3"/>
+  <circle cx="40" cy="40" r="15" fill="none" stroke="url(#loaderGradient)" stroke-width="2"/>
+  <circle cx="40" cy="40" r="10" fill="none" stroke="url(#loaderGradient)" stroke-width="2"/>
+  
+  <!-- Center focal point -->
+  <circle cx="40" cy="40" r="4" fill="url(#loaderGradient)"/>
+  
+  <!-- Camera body elements -->
+  <rect x="50" y="30" width="8" height="4" rx="2" fill="url(#loaderGradient)"/>
+  <rect x="52" y="26" width="4" height="3" rx="1" fill="url(#loaderGradient)"/>
+  
+  <!-- Text "D" stylized -->
+  <text x="40" y="70" font-family="Arial Black, sans-serif" font-size="16" font-weight="900" fill="url(#loaderGradient)" text-anchor="middle">D</text>
+</svg>

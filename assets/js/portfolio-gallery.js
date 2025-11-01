@@ -13,9 +13,30 @@ function fetchPortfolioSeries(callback) {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json();
+      return response.text(); // Получаем текст вместо автоматического парсинга JSON
     })
-    .then(data => {
+    .then(text => {
+      console.log('Raw response text length:', text.length);
+      console.log('First 100 characters of response:', text.substring(0, 100));
+      // Удаляем возможные BOM и пробельные символы
+      const cleanedText = text.replace(/^\uFEFF/, '').trim();
+      console.log('Cleaned response text length:', cleanedText.length);
+      console.log('First 100 characters of cleaned response:', cleanedText.substring(0, 100));
+      
+      // Проверяем, что текст не пустой
+      if (!cleanedText) {
+        throw new Error('Empty response received');
+      }
+      
+      // Пытаемся распарсить JSON
+      let data;
+      try {
+        data = JSON.parse(cleanedText);
+      } catch (parseError) {
+        console.error('JSON parsing failed. Response content:', cleanedText);
+        throw new Error('Invalid JSON format: ' + parseError.message);
+      }
+      
       console.log('Portfolio data received:', data);
       portfolioSeries = data;
       if (callback) callback();
@@ -27,17 +48,17 @@ function fetchPortfolioSeries(callback) {
         {
           name: 'Арт',
           folder: 'Арт',
-          images: []
+          images: ['2024_10_28_23_04_IMG_1774.jpg']
         },
         {
           name: 'Городской вайб',
           folder: 'Городской вайб',
-          images: []
+          images: ['2025_02_12_15_58_IMG_2744.jpg']
         },
         {
           name: 'Портреты',
           folder: 'Портреты',
-          images: []
+          images: ['2025_02_02_16_16_IMG_2707.jpg']
         }
       ];
       if (callback) callback();
@@ -53,7 +74,13 @@ function renderPortfolioGallery(containerId) {
   }
   container.innerHTML = '';
   
-  if (!portfolioSeries || portfolioSeries.length === 0) {
+  // Проверяем, что данные загружены
+  if (!portfolioSeries) {
+    console.warn('Portfolio data not loaded yet');
+    return;
+  }
+  
+  if (!Array.isArray(portfolioSeries) || portfolioSeries.length === 0) {
     console.warn('No portfolio series available');
     return;
   }
@@ -61,8 +88,9 @@ function renderPortfolioGallery(containerId) {
   console.log('Portfolio series to render:', portfolioSeries);
   
   portfolioSeries.forEach(series => {
-    if (!series.images || !series.images.length) {
-      console.log('Skipping series with no images:', series.name);
+    // Проверяем, что у серии есть изображения
+    if (!series || !Array.isArray(series.images) || series.images.length === 0) {
+      console.log('Skipping series with no images:', series ? series.name : 'undefined series');
       return;
     }
     const previewImg = series.images[0];
@@ -90,7 +118,6 @@ function renderPortfolioGallery(containerId) {
 
 function renderHomeGallery(containerId, seriesList) {
   console.log('Rendering home gallery for container:', containerId);
-  console.log('Series list to render:', seriesList);
   const container = document.getElementById(containerId);
   if (!container) {
     console.error('Container not found:', containerId);
@@ -98,14 +125,22 @@ function renderHomeGallery(containerId, seriesList) {
   }
   container.innerHTML = '';
   
-  if (!seriesList || seriesList.length === 0) {
+  // Если seriesList не передан, используем portfolioSeries
+  if (!seriesList && portfolioSeries) {
+    seriesList = portfolioSeries;
+  }
+  
+  if (!seriesList || !Array.isArray(seriesList) || seriesList.length === 0) {
     console.warn('No series list provided for home gallery');
     return;
   }
   
+  console.log('Series list to render:', seriesList);
+  
   seriesList.forEach(series => {
-    if (!series.images || !series.images.length) {
-      console.log('Skipping series with no images:', series.name);
+    // Проверяем, что у серии есть изображения
+    if (!series || !Array.isArray(series.images) || series.images.length === 0) {
+      console.log('Skipping series with no images:', series ? series.name : 'undefined series');
       return;
     }
     const previewImg = series.images[0];
@@ -140,14 +175,26 @@ function renderInstagramCarousel(containerId) {
   }
   container.innerHTML = '';
   
-  if (!portfolioSeries || portfolioSeries.length === 0) {
+  // Проверяем, что данные загружены
+  if (!portfolioSeries) {
+    console.warn('Portfolio data not loaded yet for carousel');
+    // Пытаемся загрузить данные
+    fetchPortfolioSeries(() => {
+      // После загрузки данных повторно вызываем функцию
+      renderInstagramCarousel(containerId);
+    });
+    return;
+  }
+  
+  if (!Array.isArray(portfolioSeries) || portfolioSeries.length === 0) {
     console.warn('No portfolio series available for carousel');
     return;
   }
   
   portfolioSeries.forEach(series => {
-    if (!series.images || !series.images.length) {
-      console.log('Skipping series with no images:', series.name);
+    // Проверяем, что у серии есть изображения
+    if (!series || !Array.isArray(series.images) || series.images.length === 0) {
+      console.log('Skipping series with no images:', series ? series.name : 'undefined series');
       return;
     }
     const previewImg = series.images[0];

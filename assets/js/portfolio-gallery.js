@@ -101,13 +101,15 @@ function renderPortfolioGallery(containerId) {
     const encodedFolder = encodeURIComponent(series.folder);
     const encodedImage = encodeURIComponent(previewImg);
     console.log('Encoded folder:', encodedFolder, 'Encoded image:', encodedImage);
+    
+    // Делаем всё изображение кликабельным, а не только знак "+"
     galleryBlock.innerHTML = `
-      <div class="box snake mb-30">
+      <div class="box snake mb-30" onclick="openSeriesGallery('${series.folder}', '${series.name}'); return false;" style="cursor: pointer;">
         <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${encodedFolder}/${encodedImage});"></div>
         <figcaption>${series.name}</figcaption>
         <div class="overlay">
           <div class="overlay-content">
-            <a href="#" onclick="openSeriesGallery('${series.folder}', '${series.name}'); return false;"><i class="ti-plus"></i></a>
+            <a href="#"><i class="ti-plus"></i></a>
           </div>
         </div>
       </div>
@@ -151,8 +153,10 @@ function renderHomeGallery(containerId, seriesList) {
     const encodedFolder = encodeURIComponent(series.folder);
     const encodedImage = encodeURIComponent(previewImg);
     console.log('Encoded folder:', encodedFolder, 'Encoded image:', encodedImage);
+    
+    // Делаем всё изображение кликабельным, ведущим на страницу портфолио
     galleryBlock.innerHTML = `
-      <div class="box snake mb-30">
+      <div class="box snake mb-30" onclick="window.location.href='portfolio.html'" style="cursor: pointer;">
         <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${encodedFolder}/${encodedImage});"></div>
         <figcaption>${series.name}</figcaption>
         <div class="overlay">
@@ -213,6 +217,7 @@ function renderInstagramCarousel(containerId) {
 
 function openSeriesGallery(folder, name) {
   // Открывает модальное окно с миниатюрами всех фото серии
+  console.log('Opening gallery for folder:', folder, 'name:', name);
   let modal = document.getElementById('portfolioModal');
   if (!modal) {
     modal = document.createElement('div');
@@ -224,8 +229,12 @@ function openSeriesGallery(folder, name) {
   modal.querySelector('.modal-title').textContent = name;
   const gallery = modal.querySelector('.modal-gallery');
   gallery.innerHTML = '';
+  
+  // Находим серию по имени папки
   const series = portfolioSeries.find(s => s.folder === folder);
-  if (series) {
+  console.log('Found series:', series);
+  
+  if (series && Array.isArray(series.images) && series.images.length > 0) {
     series.images.forEach(img => {
       // Properly encode the URL for Cyrillic characters
       const encodedFolder = encodeURIComponent(folder);
@@ -236,7 +245,24 @@ function openSeriesGallery(folder, name) {
       thumb.onclick = () => openFullImage(thumb.src);
       gallery.appendChild(thumb);
     });
+  } else {
+    // Если данные еще не загружены, попробуем загрузить их
+    fetchPortfolioSeries(() => {
+      const series = portfolioSeries.find(s => s.folder === folder);
+      if (series && Array.isArray(series.images) && series.images.length > 0) {
+        series.images.forEach(img => {
+          const encodedFolder = encodeURIComponent(folder);
+          const encodedImage = encodeURIComponent(img);
+          const thumb = document.createElement('img');
+          thumb.src = `assets/img/portfolio/${encodedFolder}/${encodedImage}`;
+          thumb.className = 'portfolio-thumb';
+          thumb.onclick = () => openFullImage(thumb.src);
+          gallery.appendChild(thumb);
+        });
+      }
+    });
   }
+  
   modal.style.display = 'block';
 }
 

@@ -6,14 +6,17 @@
 let portfolioSeries = [];
 
 function fetchPortfolioSeries(callback) {
+  console.log('Fetching portfolio data...');
   fetch('assets/php/portfolio-list.php')
     .then(response => {
+      console.log('Portfolio API response status:', response.status);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       return response.json();
     })
     .then(data => {
+      console.log('Portfolio data received:', data);
       portfolioSeries = data;
       if (callback) callback();
     })
@@ -42,6 +45,7 @@ function fetchPortfolioSeries(callback) {
 }
 
 function renderPortfolioGallery(containerId) {
+  console.log('Rendering portfolio gallery for container:', containerId);
   const container = document.getElementById(containerId);
   if (!container) {
     console.error('Container not found:', containerId);
@@ -54,14 +58,21 @@ function renderPortfolioGallery(containerId) {
     return;
   }
   
+  console.log('Portfolio series to render:', portfolioSeries);
+  
   portfolioSeries.forEach(series => {
-    if (!series.images || !series.images.length) return;
+    if (!series.images || !series.images.length) {
+      console.log('Skipping series with no images:', series.name);
+      return;
+    }
     const previewImg = series.images[0];
+    console.log('Rendering series:', series.name, 'with image:', previewImg);
     const galleryBlock = document.createElement('div');
     galleryBlock.className = 'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-30';
     // Properly encode the URL for Cyrillic characters
     const encodedFolder = encodeURIComponent(series.folder);
     const encodedImage = encodeURIComponent(previewImg);
+    console.log('Encoded folder:', encodedFolder, 'Encoded image:', encodedImage);
     galleryBlock.innerHTML = `
       <div class="box snake mb-30">
         <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${encodedFolder}/${encodedImage});"></div>
@@ -78,6 +89,8 @@ function renderPortfolioGallery(containerId) {
 }
 
 function renderHomeGallery(containerId, seriesList) {
+  console.log('Rendering home gallery for container:', containerId);
+  console.log('Series list to render:', seriesList);
   const container = document.getElementById(containerId);
   if (!container) {
     console.error('Container not found:', containerId);
@@ -91,13 +104,18 @@ function renderHomeGallery(containerId, seriesList) {
   }
   
   seriesList.forEach(series => {
-    if (!series.images || !series.images.length) return;
+    if (!series.images || !series.images.length) {
+      console.log('Skipping series with no images:', series.name);
+      return;
+    }
     const previewImg = series.images[0];
+    console.log('Rendering series:', series.name, 'with image:', previewImg);
     const galleryBlock = document.createElement('div');
     galleryBlock.className = 'col-xl-6 col-lg-6 col-md-6 col-sm-6';
     // Properly encode the URL for Cyrillic characters
     const encodedFolder = encodeURIComponent(series.folder);
     const encodedImage = encodeURIComponent(previewImg);
+    console.log('Encoded folder:', encodedFolder, 'Encoded image:', encodedImage);
     galleryBlock.innerHTML = `
       <div class="box snake mb-30">
         <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${encodedFolder}/${encodedImage});"></div>
@@ -114,6 +132,7 @@ function renderHomeGallery(containerId, seriesList) {
 }
 
 function renderInstagramCarousel(containerId) {
+  console.log('Rendering Instagram carousel for container:', containerId);
   const container = document.getElementById(containerId);
   if (!container) {
     console.error('Container not found:', containerId);
@@ -127,7 +146,10 @@ function renderInstagramCarousel(containerId) {
   }
   
   portfolioSeries.forEach(series => {
-    if (!series.images || !series.images.length) return;
+    if (!series.images || !series.images.length) {
+      console.log('Skipping series with no images:', series.name);
+      return;
+    }
     const previewImg = series.images[0];
     const carouselItem = document.createElement('div');
     carouselItem.className = 'single-instagram';

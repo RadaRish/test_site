@@ -7,25 +7,64 @@ let portfolioSeries = [];
 
 function fetchPortfolioSeries(callback) {
   fetch('assets/php/portfolio-list.php')
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then(data => {
       portfolioSeries = data;
+      if (callback) callback();
+    })
+    .catch(error => {
+      console.error('Error fetching portfolio data:', error);
+      // Fallback to static data if API fails
+      portfolioSeries = [
+        {
+          name: 'Арт',
+          folder: 'Арт',
+          images: []
+        },
+        {
+          name: 'Городской вайб',
+          folder: 'Городской вайб',
+          images: []
+        },
+        {
+          name: 'Портреты',
+          folder: 'Портреты',
+          images: []
+        }
+      ];
       if (callback) callback();
     });
 }
 
 function renderPortfolioGallery(containerId) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {
+    console.error('Container not found:', containerId);
+    return;
+  }
   container.innerHTML = '';
+  
+  if (!portfolioSeries || portfolioSeries.length === 0) {
+    console.warn('No portfolio series available');
+    return;
+  }
+  
   portfolioSeries.forEach(series => {
-    if (!series.images.length) return;
+    if (!series.images || !series.images.length) return;
     const previewImg = series.images[0];
     const galleryBlock = document.createElement('div');
     galleryBlock.className = 'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-30';
+    // Properly encode the URL for Cyrillic characters
+    const encodedFolder = encodeURIComponent(series.folder);
+    const encodedImage = encodeURIComponent(previewImg);
     galleryBlock.innerHTML = `
       <div class="box snake mb-30">
-        <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${series.folder}/${previewImg});"></div>
+        <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${encodedFolder}/${encodedImage});"></div>
         <figcaption>${series.name}</figcaption>
         <div class="overlay">
           <div class="overlay-content">
@@ -40,16 +79,28 @@ function renderPortfolioGallery(containerId) {
 
 function renderHomeGallery(containerId, seriesList) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {
+    console.error('Container not found:', containerId);
+    return;
+  }
   container.innerHTML = '';
+  
+  if (!seriesList || seriesList.length === 0) {
+    console.warn('No series list provided for home gallery');
+    return;
+  }
+  
   seriesList.forEach(series => {
-    if (!series.images.length) return;
+    if (!series.images || !series.images.length) return;
     const previewImg = series.images[0];
     const galleryBlock = document.createElement('div');
     galleryBlock.className = 'col-xl-6 col-lg-6 col-md-6 col-sm-6';
+    // Properly encode the URL for Cyrillic characters
+    const encodedFolder = encodeURIComponent(series.folder);
+    const encodedImage = encodeURIComponent(previewImg);
     galleryBlock.innerHTML = `
       <div class="box snake mb-30">
-        <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${series.folder}/${previewImg});"></div>
+        <div class="gallery-img small-img" style="background-image: url(assets/img/portfolio/${encodedFolder}/${encodedImage});"></div>
         <figcaption>${series.name}</figcaption>
         <div class="overlay">
           <div class="overlay-content">
@@ -64,15 +115,27 @@ function renderHomeGallery(containerId, seriesList) {
 
 function renderInstagramCarousel(containerId) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {
+    console.error('Container not found:', containerId);
+    return;
+  }
   container.innerHTML = '';
+  
+  if (!portfolioSeries || portfolioSeries.length === 0) {
+    console.warn('No portfolio series available for carousel');
+    return;
+  }
+  
   portfolioSeries.forEach(series => {
-    if (!series.images.length) return;
+    if (!series.images || !series.images.length) return;
     const previewImg = series.images[0];
     const carouselItem = document.createElement('div');
     carouselItem.className = 'single-instagram';
+    // Properly encode the URL for Cyrillic characters
+    const encodedFolder = encodeURIComponent(series.folder);
+    const encodedImage = encodeURIComponent(previewImg);
     carouselItem.innerHTML = `
-      <img src="assets/img/portfolio/${series.folder}/${previewImg}" alt="${series.name}">
+      <img src="assets/img/portfolio/${encodedFolder}/${encodedImage}" alt="${series.name}">
       <a href="portfolio.html"><i class="ti-instagram"></i></a>
     `;
     container.appendChild(carouselItem);
@@ -95,8 +158,11 @@ function openSeriesGallery(folder, name) {
   const series = portfolioSeries.find(s => s.folder === folder);
   if (series) {
     series.images.forEach(img => {
+      // Properly encode the URL for Cyrillic characters
+      const encodedFolder = encodeURIComponent(folder);
+      const encodedImage = encodeURIComponent(img);
       const thumb = document.createElement('img');
-      thumb.src = `assets/img/portfolio/${folder}/${img}`;
+      thumb.src = `assets/img/portfolio/${encodedFolder}/${encodedImage}`;
       thumb.className = 'portfolio-thumb';
       thumb.onclick = () => openFullImage(thumb.src);
       gallery.appendChild(thumb);
